@@ -19,8 +19,8 @@ export default function Footer() {
         <div>
           <p className="text-sm font-medium text-text-hi mb-4">Contact</p>
           <ul className="space-y-2 text-sm text-text-lo">
-            <li>hello@mindguard.ai</li>
-            <li>Built for a student hackathon</li>
+            <li>Team MindGuard</li>
+            <li></li>
           </ul>
         </div>
 
