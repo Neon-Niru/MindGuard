@@ -1,0 +1,30 @@
+import { Routes, Route } from 'react-router-dom'
+import Landing from './pages/Landing.jsx'
+import Login from './pages/Login.jsx'
+import Register from './pages/Register.jsx'
+import ForgotPassword from './pages/ForgotPassword.jsx'
+import AppLayout from './components/layout/AppLayout.jsx'
+import Dashboard from './pages/Dashboard.jsx'
+import AIChat from './pages/AIChat.jsx'
+import Planner from './pages/Planner.jsx'
+import Progress from './pages/Progress.jsx'
+import Settings from './pages/Settings.jsx'
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+
+      <Route path="/app" element={<AppLayout />}>
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="chat" element={<AIChat />} />
+        <Route path="planner" element={<Planner />} />
+        <Route path="progress" element={<Progress />} />
+        <Route path="settings" element={<Settings />} />
+      </Route>
+    </Routes>
+  )
+}
