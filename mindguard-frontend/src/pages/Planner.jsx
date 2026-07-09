@@ -5,6 +5,7 @@ import GlassCard from '../components/ui/GlassCard.jsx'
 import ProgressBar from '../components/ui/ProgressBar.jsx'
 import Badge from '../components/ui/Badge.jsx'
 import Button from '../components/ui/Button.jsx'
+import TextField from '../components/ui/TextField.jsx'
 import { planner as plannerApi } from '../services/api'
 
 const priorityTone = { High: 'high', Medium: 'moderate', Low: 'low' }
@@ -12,6 +13,8 @@ const priorityTone = { High: 'high', Medium: 'moderate', Low: 'low' }
 export default function Planner() {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [form, setForm] = useState({ title: '', description: '', category: 'General', priority: 'Medium', due_date: '', due_time: '' })
 
   useEffect(() => {
     plannerApi.list()
@@ -30,6 +33,15 @@ export default function Planner() {
   async function deleteTask(taskId) {
     await plannerApi.remove(taskId)
     setTasks((prev) => prev.filter((t) => t.task_id !== taskId))
+  }
+
+  async function addTask(e) {
+    e.preventDefault()
+    if (!form.title.trim()) return
+    const res = await plannerApi.add({ ...form, task_source: 'USER' })
+    setTasks((prev) => [{ ...form, task_id: res.task_id, completed: false, task_source: 'USER' }, ...prev])
+    setForm({ title: '', description: '', category: 'General', priority: 'Medium', due_date: '', due_time: '' })
+    setShowForm(false)
   }
 
   const completed = tasks.filter((t) => t.completed).length
@@ -61,6 +73,83 @@ export default function Planner() {
         </div>
         <ProgressBar value={percent} height="h-3" />
       </GlassCard>
+
+      <div className="flex justify-end mb-4">
+        <Button variant="secondary" icon={Plus} onClick={() => setShowForm(!showForm)}>
+          {showForm ? 'Cancel' : 'New Task'}
+        </Button>
+      </div>
+
+      {showForm && (
+        <GlassCard className="p-6 mb-6">
+          <form onSubmit={addTask} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2">
+                <TextField
+                  label="Title *"
+                  placeholder="What do you need to do?"
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <TextField
+                  label="Description"
+                  placeholder="Optional details..."
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                />
+              </div>
+              <label className="block">
+                <span className="block text-xs text-text-lo mb-2">Category</span>
+                <select
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-text-hi outline-none focus:border-accent-purple/50 appearance-none cursor-pointer"
+                >
+                  <option value="General">General</option>
+                  <option value="Study">Study</option>
+                  <option value="Assignment">Assignment</option>
+                  <option value="Exam">Exam</option>
+                  <option value="Recovery">Recovery</option>
+                  <option value="Exercise">Exercise</option>
+                  <option value="Personal">Personal</option>
+                  <option value="Other">Other</option>
+                </select>
+              </label>
+              <label className="block">
+                <span className="block text-xs text-text-lo mb-2">Priority</span>
+                <select
+                  value={form.priority}
+                  onChange={(e) => setForm({ ...form, priority: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-sm text-text-hi outline-none focus:border-accent-purple/50 appearance-none cursor-pointer"
+                >
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                </select>
+              </label>
+              <TextField
+                label="Due Date"
+                type="date"
+                value={form.due_date}
+                onChange={(e) => setForm({ ...form, due_date: e.target.value })}
+              />
+              <TextField
+                label="Due Time"
+                type="time"
+                value={form.due_time}
+                onChange={(e) => setForm({ ...form, due_time: e.target.value })}
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button variant="ghost" type="button" onClick={() => setShowForm(false)}>Cancel</Button>
+              <Button variant="primary" type="submit">Add Task</Button>
+            </div>
+          </form>
+        </GlassCard>
+      )}
 
       {tasks.length === 0 && (
         <GlassCard className="p-7 text-center">
